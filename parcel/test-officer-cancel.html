@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Officer Cancel Booking API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Officer Cancel Booking API</h1>
+    
+    <div class="section">
+        <h2>Officer Token</h2>
+        <div class="form-group">
+            <label>Officer Token:</label>
+            <input type="text" id="officerToken" placeholder="Enter officer JWT token">
+        </div>
+        <button onclick="testOfficerToken()">Test Officer Token</button>
+        <div id="tokenResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Cancel Officer Booking</h2>
+        <div class="form-group">
+            <label>Booking ID:</label>
+            <input type="text" id="bookingId" placeholder="Enter booking ID to cancel">
+        </div>
+        <button onclick="cancelOfficerBooking()">Cancel Officer Booking</button>
+        <div id="cancelResult" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>Test Health Check</h2>
+        <button onclick="testHealthCheck()">Test Health Check</button>
+        <div id="healthResult" class="result"></div>
+    </div>
+
+    <script>
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    return { success: true, data: text };
+                } else {
+                    const text = await response.text();
+                    return { success: false, error: text };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testOfficerToken() {
+            const token = document.getElementById('officerToken').value;
+            const resultDiv = document.getElementById('tokenResult');
+            
+            if (!token) {
+                resultDiv.textContent = 'Error: Please enter an officer token';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            resultDiv.textContent = 'Testing token...';
+            resultDiv.className = 'result';
+            
+            const result = await makeRequest('http://localhost:8080/api/cancel-booking/test', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (result.success) {
+                resultDiv.textContent = 'Success: ' + result.data;
+                resultDiv.className = 'result success';
+            } else {
+                resultDiv.textContent = 'Error: ' + result.error;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function cancelOfficerBooking() {
+            const token = document.getElementById('officerToken').value;
+            const bookingId = document.getElementById('bookingId').value;
+            const resultDiv = document.getElementById('cancelResult');
+            
+            if (!token) {
+                resultDiv.textContent = 'Error: Please enter an officer token first';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            if (!bookingId) {
+                resultDiv.textContent = 'Error: Please enter a booking ID';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            resultDiv.textContent = 'Cancelling officer booking...';
+            resultDiv.className = 'result';
+            
+            const result = await makeRequest(`http://localhost:8080/api/cancel-booking/officer?bookingId=${bookingId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (result.success) {
+                resultDiv.textContent = 'Success: ' + result.data;
+                resultDiv.className = 'result success';
+            } else {
+                resultDiv.textContent = 'Error: ' + result.error;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testHealthCheck() {
+            const resultDiv = document.getElementById('healthResult');
+            
+            resultDiv.textContent = 'Testing health check...';
+            resultDiv.className = 'result';
+            
+            const result = await makeRequest('http://localhost:8080/api/cancel-booking/health');
+            
+            if (result.success) {
+                resultDiv.textContent = 'Success: ' + result.data;
+                resultDiv.className = 'result success';
+            } else {
+                resultDiv.textContent = 'Error: ' + result.error;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html> 

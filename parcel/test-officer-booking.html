@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Officer Booking API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Officer Booking API</h1>
+    
+    <div class="section">
+        <h2>Officer Token</h2>
+        <div class="form-group">
+            <label>Officer Token:</label>
+            <input type="text" id="officerToken" placeholder="Enter officer JWT token">
+        </div>
+        <button onclick="testOfficerToken()">Test Officer Token</button>
+        <div id="tokenResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Create Officer Booking</h2>
+        <div class="form-group">
+            <label>Receiver Name:</label>
+            <input type="text" id="receiverName" value="John Doe">
+        </div>
+        <div class="form-group">
+            <label>Receiver Address:</label>
+            <textarea id="receiverAddress" rows="3">123 Test Street, Test City</textarea>
+        </div>
+        <div class="form-group">
+            <label>Receiver PIN:</label>
+            <input type="text" id="receiverPin" value="123456">
+        </div>
+        <div class="form-group">
+            <label>Receiver Mobile:</label>
+            <input type="text" id="receiverMobile" value="9876543210">
+        </div>
+        <div class="form-group">
+            <label>Parcel Weight (grams):</label>
+            <input type="number" id="parcelWeight" value="1000">
+        </div>
+        <div class="form-group">
+            <label>Parcel Contents:</label>
+            <textarea id="parcelContents" rows="3">Test package contents</textarea>
+        </div>
+        <div class="form-group">
+            <label>Delivery Type:</label>
+            <select id="deliveryType">
+                <option value="STANDARD">Standard</option>
+                <option value="EXPRESS">Express</option>
+                <option value="SAME_DAY">Same Day</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Packing Preference:</label>
+            <select id="packingPreference">
+                <option value="BASIC">Basic</option>
+                <option value="PREMIUM">Premium</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Pickup Date:</label>
+            <input type="datetime-local" id="pickupTime">
+        </div>
+        <div class="form-group">
+            <label>Dropoff Date:</label>
+            <input type="datetime-local" id="dropoffTime">
+        </div>
+        <button onclick="createOfficerBooking()">Create Officer Booking</button>
+        <div id="bookingResult" class="result"></div>
+    </div>
+
+    <script>
+        // Set default dates
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dayAfter = new Date();
+        dayAfter.setDate(dayAfter.getDate() + 2);
+        
+        document.getElementById('pickupTime').value = tomorrow.toISOString().slice(0, 16);
+        document.getElementById('dropoffTime').value = dayAfter.toISOString().slice(0, 16);
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    return { success: true, data: text };
+                } else {
+                    const text = await response.text();
+                    return { success: false, error: text };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testOfficerToken() {
+            const token = document.getElementById('officerToken').value;
+            const resultDiv = document.getElementById('tokenResult');
+            
+            if (!token) {
+                resultDiv.textContent = 'Error: Please enter an officer token';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            resultDiv.textContent = 'Testing token...';
+            resultDiv.className = 'result';
+            
+            const result = await makeRequest('http://localhost:8080/api/bookings/test-token', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (result.success) {
+                resultDiv.textContent = 'Success: ' + result.data;
+                resultDiv.className = 'result success';
+            } else {
+                resultDiv.textContent = 'Error: ' + result.error;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function createOfficerBooking() {
+            const token = document.getElementById('officerToken').value;
+            const resultDiv = document.getElementById('bookingResult');
+            
+            if (!token) {
+                resultDiv.textContent = 'Error: Please enter an officer token first';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            resultDiv.textContent = 'Creating officer booking...';
+            resultDiv.className = 'result';
+            
+            const bookingRequest = {
+                receiverName: document.getElementById('receiverName').value,
+                receiverAddress: document.getElementById('receiverAddress').value,
+                receiverPin: document.getElementById('receiverPin').value,
+                receiverMobile: document.getElementById('receiverMobile').value,
+                parcelWeightInGram: parseInt(document.getElementById('parcelWeight').value),
+                parcelContentsDescription: document.getElementById('parcelContents').value,
+                parcelDeliveryType: document.getElementById('deliveryType').value,
+                parcelPackingPreference: document.getElementById('packingPreference').value,
+                parcelPickupTime: document.getElementById('pickupTime').value + ':00',
+                parcelDropoffTime: document.getElementById('dropoffTime').value + ':00'
+            };
+            
+            console.log('Booking request:', bookingRequest);
+            
+            const result = await makeRequest('http://localhost:8080/api/bookings/officer', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(bookingRequest)
+            });
+            
+            if (result.success) {
+                resultDiv.textContent = 'Success: ' + result.data;
+                resultDiv.className = 'result success';
+            } else {
+                resultDiv.textContent = 'Error: ' + result.error;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html> 

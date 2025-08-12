@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice Test</title>
+</head>
+<body>
+    <h1>Invoice Test</h1>
+    <button onclick="testInvoice()">Test Invoice Generation</button>
+    <button onclick="testDownload()">Test PDF Download</button>
+    <div id="result"></div>
+
+    <script>
+        async function testInvoice() {
+            try {
+                const response = await fetch('http://localhost:8080/api/payments/BK123456789/invoice', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        }
+
+        async function testDownload() {
+            try {
+                const response = await fetch('http://localhost:8080/api/payments/invoice/BK123456789/download', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'test_invoice.pdf';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.getElementById('result').innerHTML = '<p style="color: green;">PDF downloaded successfully!</p>';
+                } else {
+                    document.getElementById('result').innerHTML = '<p style="color: red;">Download failed: ' + response.status + '</p>';
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html> 

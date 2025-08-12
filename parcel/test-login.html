@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test - Unique ID Authentication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .test-form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #0891b2;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0e7490;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            color: #0891b2;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            color: #666;
+            margin: 0;
+        }
+        .id-examples {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0891b2;
+        }
+        .id-examples h4 {
+            margin: 0 0 10px 0;
+            color: #0891b2;
+        }
+        .id-examples ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .id-examples li {
+            margin-bottom: 5px;
+            font-family: monospace;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔐 Login Test - Unique ID Authentication</h1>
+        <p>Test the new login system using Customer ID and Officer ID</p>
+    </div>
+
+    <div class="test-container">
+        <!-- Customer Login Test -->
+        <div class="test-form">
+            <h2>👤 Customer Login</h2>
+            <div class="id-examples">
+                <h4>Customer ID Examples:</h4>
+                <ul>
+                    <li>CUST123456789</li>
+                    <li>CUST987654321</li>
+                    <li>CUST555666777</li>
+                </ul>
+            </div>
+            <form id="customerLoginForm">
+                <div class="form-group">
+                    <label for="customerId">Customer ID:</label>
+                    <input type="text" id="customerId" name="customerId" placeholder="Enter Customer ID (e.g., CUST123456789)" pattern="CUST\d{9,12}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerPassword">Password:</label>
+                    <input type="password" id="customerPassword" name="customerPassword" placeholder="Enter password" required>
+                </div>
+                
+                <button type="submit">Login as Customer</button>
+            </form>
+            
+            <div id="customerResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Officer Login Test -->
+        <div class="test-form">
+            <h2>👮 Officer Login</h2>
+            <div class="id-examples">
+                <h4>Officer ID Examples:</h4>
+                <ul>
+                    <li>OFF123456789</li>
+                    <li>OFF987654321</li>
+                    <li>OFF555666777</li>
+                </ul>
+            </div>
+            <form id="officerLoginForm">
+                <div class="form-group">
+                    <label for="officerId">Officer ID:</label>
+                    <input type="text" id="officerId" name="officerId" placeholder="Enter Officer ID (e.g., OFF123456789)" pattern="OFF\d{9,12}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="officerPassword">Password:</label>
+                    <input type="password" id="officerPassword" name="officerPassword" placeholder="Enter password" required>
+                </div>
+                
+                <button type="submit">Login as Officer</button>
+            </form>
+            
+            <div id="officerResult" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="test-form" style="margin-top: 2rem;">
+        <h2>📋 Instructions</h2>
+        <div class="info">
+            <h4>How to test:</h4>
+            <ol>
+                <li><strong>First, register a new account</strong> using the registration test page</li>
+                <li><strong>Note down the Unique ID</strong> that's shown in the success dialog</li>
+                <li><strong>Use that Unique ID</strong> to login here</li>
+                <li><strong>Use the same password</strong> you used during registration</li>
+            </ol>
+            
+            <h4>ID Format:</h4>
+            <ul>
+                <li><strong>Customer IDs:</strong> Start with "CUST" followed by 9-12 digits</li>
+                <li><strong>Officer IDs:</strong> Start with "OFF" followed by 9-12 digits</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Customer Login
+        document.getElementById('customerLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                email: formData.get('customerId'), // Backend expects 'email' but we send uniqueId
+                password: formData.get('customerPassword')
+            };
+            
+            const resultDiv = document.getElementById('customerResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Logging in...';
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+✅ Customer Login Successful!
+
+📋 User Details:
+• Name: ${result.customerName}
+• Email: ${result.email}
+• Role: ${result.role}
+• Unique ID: ${result.uniqueId}
+• ID: ${result.id}
+
+🎉 Welcome back, ${result.customerName}!
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Login Failed: ${result.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        });
+
+        // Officer Login
+        document.getElementById('officerLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                email: formData.get('officerId'), // Backend expects 'email' but we send uniqueId
+                password: formData.get('officerPassword')
+            };
+            
+            const resultDiv = document.getElementById('officerResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Logging in...';
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/officer-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+✅ Officer Login Successful!
+
+📋 User Details:
+• Name: ${result.customerName}
+• Email: ${result.email}
+• Role: ${result.role}
+• Unique ID: ${result.uniqueId}
+• ID: ${result.id}
+
+🎉 Welcome back, Officer ${result.customerName}!
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Login Failed: ${result.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
+

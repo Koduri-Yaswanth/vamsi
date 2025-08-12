@@ -1,0 +1,18 @@
+package com.courier.model;
+
+public enum TransactionStatus {
+    PENDING("Pending"),
+    SUCCESS("Success"),
+    FAILED("Failed"),
+    CANCELLED("Cancelled");
+    
+    private final String displayName;
+    
+    TransactionStatus(String displayName) {
+        this.displayName = displayName;
+    }
+    
+    public String getDisplayName() {
+        return displayName;
+    }
+} 
